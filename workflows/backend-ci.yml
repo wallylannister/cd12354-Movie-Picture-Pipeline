@@ -1,0 +1,98 @@
+name: Backend Continuous Integration
+
+# Trigger the workflow on pull requests and manual dispatch
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    # Checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Setup NodeJS environment
+    - name: Setup NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    # Cache node modules to speed up the workflow
+    - name: Cache node modules
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Run linting
+    - name: Run lint
+      run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    # Checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Setup NodeJS environment
+    - name: Setup NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    # Cache node modules to speed up the workflow
+    - name: Cache node modules
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Run tests
+    - name: Run tests
+      run: npm run test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+    # Checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Setup NodeJS environment
+    - name: Setup NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    # Cache node modules to speed up the workflow
+    - name: Cache node modules
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Build the application
+    - name: Build application
+      run: npm run build
