@@ -52,7 +52,7 @@ jobs:
       - name: Run tests
         run: pipenv run test
 
-  build:
+  build-and-deploy:
     needs: [test, lint]
     runs-on: ubuntu-latest
     defaults:
@@ -75,12 +75,6 @@ jobs:
       - name: Tag Docker Image
         run: docker tag my-backend:latest ${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -100,3 +94,11 @@ jobs:
           kustomize edit set image backend=${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
           kustomize build | kubectl apply -f -
         shell: bash
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
+      
