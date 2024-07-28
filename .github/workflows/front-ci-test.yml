@@ -50,22 +50,22 @@ jobs:
         run: docker build -t my-frontend:latest .
         
 
-  comment:
-    needs: [lint, test, build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Comment on PR
-        if: always() # Ensures this step runs even if previous steps fail
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { context, github } = require('@actions/github');
-            const comment = {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: 'CI Pipeline completed. Check the results above.'
-            };
-            github.rest.issues.createComment(comment);
+  # comment:
+  #   needs: [lint, test, build]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Comment on PR
+  #       if: always() # Ensures this step runs even if previous steps fail
+  #       uses: actions/github-script@v6
+  #       with:
+  #         script: |
+  #           const { context, github } = require('@actions/github');
+  #           const comment = {
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             issue_number: context.issue.number,
+  #             body: 'CI Pipeline completed. Check the results above.'
+  #           };
+  #           github.rest.issues.createComment(comment);
