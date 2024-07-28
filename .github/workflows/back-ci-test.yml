@@ -1,0 +1,76 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'starter/backend/**'  # Trigger only when files in the backend directory change
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter/backend
+    steps:
+      - name: Setup Project
+        uses: wallylannister/cd12354-Movie-Picture-Pipeline@main
+        with:
+          node-version: '14'
+      - name: Run ESLint
+        run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter/backend
+    steps:
+      - name: Setup Project
+        uses: wallylannister/cd12354-Movie-Picture-Pipeline@main
+        with:
+          node-version: '14'
+      - name: Run Tests
+        run: npm test
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: starter/backend
+    steps:
+      - name: Setup Project
+        uses: wallylannister/cd12354-Movie-Picture-Pipeline@main
+        with:
+          node-version: '14'
+      - name: Build Docker Image
+        run: docker build -t my-backend:latest .
+        
+
+  comment:
+    needs: [lint, test, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Post PR Comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { context } = require('@actions/github');
+            const prNumber = context.payload.pull_request.number;
+            const comment = `
+              CI Workflow completed successfully!
+              - Lint: Passed
+              - Tests: Passed
+              - Build: Successful
+            `;
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: prNumber,
+              body: comment
+            });

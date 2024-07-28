@@ -1,4 +1,4 @@
-name: Frontend Continuous Deployment
+name: Backend Continuous Deployment
 
 # Trigger the workflow on pushes to the main branch and manual dispatch
 on:
@@ -101,18 +101,18 @@ jobs:
 
     # Build Docker image with build-args
     - name: Build Docker image
-      run: docker build -t ${{ secrets.ECR_REGISTRY }}/frontend:${{ github.sha }} --build-arg REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL }} .
+      run: docker build -t ${{ secrets.ECR_REGISTRY_B }}/backend:${{ github.sha }} .
 
     # Login to Amazon ECR
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       with:
-        registry: ${{ secrets.ECR_REGISTRY }}
+        registry: ${{ secrets.ECR_REGISTRY_B }}
 
     # Push Docker image to ECR
     - name: Push Docker image to ECR
-      run: docker push ${{ secrets.ECR_REGISTRY }}/frontend:${{ github.sha }}
+      run: docker push ${{ secrets.ECR_REGISTRY_B }}/backend:${{ github.sha }}
 
     # Deploy to EKS
     - name: Deploy to EKS
@@ -120,5 +120,5 @@ jobs:
       with:
         cluster-name: ${{ secrets.EKS_CLUSTER_NAME }}
         region: ${{ secrets.AWS_REGION }}
-        service: frontend
-        image: ${{ secrets.ECR_REGISTRY }}/frontend:${{ github.sha }}
+        service: backend
+        image: ${{ secrets.ECR_REGISTRY_B }}/backend:${{ github.sha }}

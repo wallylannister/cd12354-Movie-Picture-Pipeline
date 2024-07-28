@@ -1,4 +1,4 @@
-name: Backend Continuous Deployment
+name: Frontend Continuous Deployment
 
 # Trigger the workflow on pushes to the main branch and manual dispatch
 on:
@@ -101,24 +101,48 @@ jobs:
 
     # Build Docker image with build-args
     - name: Build Docker image
-      run: docker build -t ${{ secrets.ECR_REGISTRY }}/backend:${{ github.sha }} .
+      run: docker build -t ${{ secrets.ECR_REGISTRY_F }}/frontend:${{ github.sha }} --build-arg REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL }} .
 
     # Login to Amazon ECR
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       with:
-        registry: ${{ secrets.ECR_REGISTRY }}
+        registry: ${{ secrets.ECR_REGISTRY_F }}
 
     # Push Docker image to ECR
     - name: Push Docker image to ECR
-      run: docker push ${{ secrets.ECR_REGISTRY }}/backend:${{ github.sha }}
+      run: docker push ${{ secrets.ECR_REGISTRY_F }}/frontend:${{ github.sha }}
 
     # Deploy to EKS
-    - name: Deploy to EKS
-      uses: actions/aws-eks-deploy@v1
-      with:
-        cluster-name: ${{ secrets.EKS_CLUSTER_NAME }}
-        region: ${{ secrets.AWS_REGION }}
-        service: backend
-        image: ${{ secrets.ECR_REGISTRY }}/backend:${{ github.sha }}
+    # - name: Deploy to EKS
+      # uses: actions/aws-eks-deploy@v1
+      # with:
+      #   cluster-name: ${{ secrets.EKS_CLUSTER_NAME }}
+      #   region: ${{ secrets.AWS_REGION }}
+      #   service: frontend
+      #   image: ${{ secrets.ECR_REGISTRY_F }}/frontend:${{ github.sha }}
+    # Deploy job
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build # Ensure build job completes successfully before running deploy
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Setup kubectl
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
+
+      # Deploy to EKS using kustomize
+      - name: Deploy to EKS using kustomize
+        run: |
+          cd starter/frontend/k8s
+          kubectl apply -k .
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+      
