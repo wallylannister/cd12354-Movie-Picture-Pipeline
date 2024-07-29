@@ -61,7 +61,20 @@ jobs:
           cd k8s
           kustomize edit set image frontend=${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
           kustomize build | kubectl apply -f -
-          kubectl get svc -A
+
+  post-build:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Create Build text file
+        run: |  
+          mkdir -p output
+          echo "kubectl get svc -A" > output/build.txt
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: output/
 
   # deploy:
   #   needs: build
