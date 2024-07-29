@@ -76,7 +76,8 @@ jobs:
           pip install pipenv
           pipenv install
 
-      - name: Build Docker image
+      - name: Build Docker image & Save API to GHA Env
         run: |
           docker build -t my-backend:latest .
+          echo "REACT_APP_MOVIE_API_URL=$(docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' backend | grep REACT_APP_MOVIE_API_URL | cut -d '=' -f2)" >> $GITHUB_ENV
         
