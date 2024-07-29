@@ -45,11 +45,12 @@ jobs:
           aws eks update-kubeconfig --name cluster --region ${{ secrets.AWS_REGION }}
           kubectl get svc -A
           BACKEND_ENDPOINT=$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-          echo "BACKEND_ENDPOINT" >> $GITHUB_ENV
+          
+          echo "::set-output name=movie_api_url::BACKEND_ENDPOINT" >> $GITHUB_ENV
           
       
       - name: Build Docker Image
-        run: docker build --build-arg REACT_APP_MOVIE_API_URL=${{ env.BACKEND_ENDPOINT }} -t my-frontend:latest .
+        run: docker build --build-arg REACT_APP_MOVIE_API_URL=${{ env.movie_api_url }} -t my-frontend:latest .
         working-directory: frontend
       - name: Tag Docker Image
         run: docker tag my-frontend:latest ${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
