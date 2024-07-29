@@ -56,16 +56,18 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
           docker push ${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./starter/frontend/k8s
-    steps:
       - name: Deploy to Kubernetes
         run: |
+          cd k8s
           kustomize edit set image frontend=${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
           kustomize build | kubectl apply -f -
           kubectl get svc -A
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./starter/frontend/k8s
+  #   steps:
+      
