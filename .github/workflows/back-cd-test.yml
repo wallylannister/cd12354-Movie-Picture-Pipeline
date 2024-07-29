@@ -91,6 +91,10 @@ jobs:
           docker push ${{ secrets.ECR_REGISTRY_B }}:${{ github.sha }}
 
         shell: bash
+      - name: Install kubectl
+        run: |
+          aws eks update-kubeconfig --name cluster --region ${{ secrets.AWS_REGION }}
+
       - name: Deploy to Kubernetes
         run: |
           cd k8s
