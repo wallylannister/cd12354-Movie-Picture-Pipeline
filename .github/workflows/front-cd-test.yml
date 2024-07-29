@@ -33,6 +33,12 @@ jobs:
         uses: wallylannister/cd12354-Movie-Picture-Pipeline@main
         with:
           node-version: '18'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
       - name: Get Backend Service endpoint
         id: get_be_service_url
         run: |
