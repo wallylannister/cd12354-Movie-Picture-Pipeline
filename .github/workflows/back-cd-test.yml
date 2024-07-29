@@ -93,6 +93,7 @@ jobs:
         shell: bash
       - name: Deploy to Kubernetes
         run: |
+          cd k8s
           kustomize edit set image backend=${{ secrets.ECR_REGISTRY_B }}:${{ github.sha }}
           kustomize build | kubectl apply -f -
         shell: bash
