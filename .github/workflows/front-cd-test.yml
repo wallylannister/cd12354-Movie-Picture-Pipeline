@@ -33,8 +33,16 @@ jobs:
         uses: wallylannister/cd12354-Movie-Picture-Pipeline@main
         with:
           node-version: '18'
+      - name: Get Backend Service endpoint
+        id: get_be_service_url
+        run: |
+          kubectl get svc -A
+          BACKEND_ENDPOINT=$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "BACKEND_ENDPOINT" >> $GITHUB_ENV
+          
+      
       - name: Build Docker Image
-        run: docker build --build-arg REACT_APP_MOVIE_API_URL=${{ env.REACT_APP_MOVIE_API_URL }} -t my-frontend:latest .
+        run: docker build --build-arg REACT_APP_MOVIE_API_URL=${{ env.BACKEND_ENDPOINT }} -t my-frontend:latest .
         working-directory: frontend
       - name: Tag Docker Image
         run: docker tag my-frontend:latest ${{ secrets.ECR_REGISTRY_F }}:${{ github.sha }}
