@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: starter/frontend/k8s
+        working-directory: ./starter/frontend/k8s
     steps:
       - name: Deploy to Kubernetes
         run: |
