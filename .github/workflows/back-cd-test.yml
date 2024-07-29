@@ -86,7 +86,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
       - name: Push Docker Image to ECR
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_B }}
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
           docker push ${{ secrets.ECR_REGISTRY_B }}:${{ github.sha }}
         shell: bash
       - name: Deploy to Kubernetes
