@@ -69,7 +69,7 @@ jobs:
       - name: Create Build text file
         run: |  
           mkdir -p output
-          echo "kubectl get svc -A" > output/build.txt
+          echo "$(kubectl get svc -A)" > output/build.txt
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
