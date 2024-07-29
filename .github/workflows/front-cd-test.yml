@@ -36,6 +36,7 @@ jobs:
       - name: Get Backend Service endpoint
         id: get_be_service_url
         run: |
+          aws eks update-kubeconfig --name cluster --region ${{ secrets.AWS_REGION }}
           kubectl get svc -A
           BACKEND_ENDPOINT=$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
           echo "BACKEND_ENDPOINT" >> $GITHUB_ENV
